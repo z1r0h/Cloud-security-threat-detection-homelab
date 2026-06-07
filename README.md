@@ -6,6 +6,7 @@ A home lab built on GCP to simulate real attacks and practice threat detection u
 
 ## 🖥️ Lab Architecture
 
+Created by [Mermaid Live Editor](https://mermaid.ai/)
 ```mermaid
 ---
 config:
@@ -91,6 +92,54 @@ Access is via **Google IAP Tunnel** only.
 ```
 
 ---
+
+## 🔧 Splunk Apps
+
+Three apps are installed on `splunk-server` to enable automated detection and MITRE ATT&CK correlation.
+
+| # | App | Splunkbase | Role |
+|---|---|---|---|
+| 1 | **Splunk Add-on for Sysmon** | [ID 5709](https://splunkbase.splunk.com/app/5709) | Foundation layer |
+| 2 | **Splunk Security Essentials** | [ID 3435](https://splunkbase.splunk.com/app/3435) | Detection rules |
+| 3 | **MITRE ATT&CK App for Splunk** | [ID 4617](https://splunkbase.splunk.com/app/4617) | Visual matrix |
+
+### How they work together
+
+```
+Sysmon (Windows)
+    │  Event logs forwarded via port 9997
+    ▼
+Splunk Add-on for Sysmon (5709)
+    │  Maps raw Sysmon XML fields → CIM-standard field names
+    │  e.g. SourceIp, DestinationPort, Image, CommandLine
+    ▼
+Splunk Security Essentials (3435)
+    │  100+ pre-built detection rules run against normalised fields
+    │  Each rule tagged with MITRE ATT&CK technique ID
+    │  Fires alerts e.g. "Port Scan Detected — T1046 — Discovery"
+    ▼
+MITRE ATT&CK App (4617)
+    │  Reads alert hits and populates the ATT&CK matrix
+    ▼
+ATT&CK Matrix Dashboard
+    Tactic columns light up based on what was detected in your lab
+```
+
+### App details
+
+**Splunk Add-on for Sysmon (5709)** — Install first  
+Translates raw Sysmon XML into standardised CIM field names that other apps understand. Without this, Security Essentials rules won't match field names and detection won't work.
+
+> ⚠️ The old Sysmon App (ID 3544) is archived — do not use it. Use 5709 instead.
+
+**Splunk Security Essentials (3435)** — Most important  
+Pre-built detections for all common attack types: brute force, credential dumping, port scan, lateral movement, persistence, C2 beaconing. Each detection is already mapped to a MITRE technique ID and links directly to `attack.mitre.org`. No SPL needed to get started — just enable a rule and the alert is created automatically.
+
+**MITRE ATT&CK App for Splunk (4617)** — Install last  
+Renders a live ATT&CK matrix heatmap inside Splunk. After running a port scan in the lab, T1046 (Network Service Discovery) under the Discovery tactic column will light up. Clicking any cell opens the full technique description on the MITRE website.
+
+---
+
 
 ## 🔴 Attack Scenarios (Coming Soon)
 
