@@ -115,7 +115,6 @@ This lab is for **educational purposes only**.
 All credentials shown in setup docs are lab-only and should never be used in production.
 
 ---
-<img width="2212" height="572" alt="image" src="https://github.com/user-attachments/assets/7ef0b3f0-be18-45e7-8e1f-029766cf7c87" />
 
 
 ## 📜 Author
