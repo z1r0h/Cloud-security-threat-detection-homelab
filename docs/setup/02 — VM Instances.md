@@ -55,8 +55,9 @@ All VMs are in region `asia-southeast1`, zone `asia-southeast1-a`, on the `secur
 - OS: Kali Linux with XFCE4 Desktop GUI (from GCP Marketplace)
 - Networking:
   - Network / Subnet: `security-lab-vpc` / `lab-subnet`
-  - Primary internal IP: `10.0.10.100` (custom)
+  - Primary internal IP: `10.0.10.3` (custom)
   - External IP: **Ephemeral** (for downloading attack tools)
+  - Visit [Kali Linux with Desktop GUI on Azure/AWS/GCP](https://cloudinfrastructureservices.co.uk/kali-linux-with-desktop-gui-on-azure-aws-gcp) to complete full setup
 
 ### Auto-start VNC on boot
 
@@ -81,9 +82,10 @@ ExecStop=/usr/bin/vncserver -kill :1
 [Install]
 WantedBy=multi-user.target
 EOF
-
+------------------------------------------------(next)
 sudo systemctl daemon-reload
 sudo systemctl enable vncserver.service
+------------------------------------------------(next)
 sudo systemctl start vncserver.service
 sudo systemctl status vncserver.service
 ```
