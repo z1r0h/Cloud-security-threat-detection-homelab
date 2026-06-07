@@ -88,7 +88,6 @@ Access is via **Google IAP Tunnel** only.
 ├── attacks/             # Attack scenarios (commands + screenshots)
 ├── detection/           # Splunk SPL queries and alert rules
 ├── scripts/             # Helper scripts (VM recovery, etc.)
-└── assets/              # Architecture diagrams
 ```
 
 ---
