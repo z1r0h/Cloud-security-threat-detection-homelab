@@ -43,7 +43,8 @@ Create or edit the file:
 ```ini
 [WinEventLog://Microsoft-Windows-Sysmon/Operational]
 disabled = false
-renderXml = true
+renderXml = 1
+source = XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 index = wineventlog
 ```
 
