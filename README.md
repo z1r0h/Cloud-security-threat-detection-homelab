@@ -189,7 +189,14 @@ Renders a live ATT&CK matrix heatmap. After a port scan alert fires, T1046 (Netw
 
 ## 🔵 Detection (Coming Soon)
 
-Each attack will have a matching Splunk SPL query and alert rule documented in `detection/`.
+Each attack scenario has a matching Splunk SPL query and alert rule documented in [`detection/`](detection/).
+ 
+Detection flow for every scenario:
+1. Run attack from `kali-linux-attacker-vm`
+2. Sysmon captures event on victim VM
+3. Splunk Universal Forwarder sends log to `splunk-server`
+4. Security Essentials rule fires and creates alert
+5. MITRE ATT&CK App matrix highlights the technique
 
 ---
 
