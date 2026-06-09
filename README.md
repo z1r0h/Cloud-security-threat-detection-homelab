@@ -115,50 +115,65 @@ Created by [Mermaid Live Editor](https://mermaid.ai/)
 ---
 
 ## 🔧 Splunk Apps
-
-Three apps are installed on `splunk-server` to enable automated detection and MITRE ATT&CK correlation.
-
+ 
+Four apps are installed on `splunk-server`. Install in this exact order:
+ 
 | # | App | Splunkbase | Role |
 |---|---|---|---|
-| 1 | **Splunk Add-on for Sysmon** | [ID 5709](https://splunkbase.splunk.com/app/5709) | Foundation layer |
-| 2 | **Splunk Security Essentials** | [ID 3435](https://splunkbase.splunk.com/app/3435) | Detection rules |
-| 3 | **MITRE ATT&CK App for Splunk** | [ID 4617](https://splunkbase.splunk.com/app/4617) | Visual matrix |
-
+| 1 | **Splunk Add-on for Sysmon** | [ID 5709](https://splunkbase.splunk.com/app/5709) | Parses Sysmon XML into searchable fields |
+| 2 | **Splunk Add-on for Microsoft Windows** | [ID 742](https://splunkbase.splunk.com/app/742) | Parses native Windows Event Log fields |
+| 3 | **Splunk Security Essentials** | [ID 3435](https://splunkbase.splunk.com/app/3435) | SPL reference library + MITRE-mapped detection templates |
+| 4 | **MITRE ATT&CK App for Splunk** | [ID 4617](https://splunkbase.splunk.com/app/4617) | Visual ATT&CK matrix heatmap |
+ 
 ### How they work together
-
+ 
 ```
-Sysmon (Windows)
-    │  Event logs forwarded via port 9997
+Sysmon + Windows Event Logs (win-dc, win-client)
+    │  Forwarded via Splunk Universal Forwarder → port 9997
     ▼
-Splunk Add-on for Sysmon (5709)
-    │  Maps raw Sysmon XML fields → CIM-standard field names
-    │  e.g. SourceIp, DestinationPort, Image, CommandLine
+TA for Sysmon (5709) + TA for Windows (742)
+    │  Parse raw XML into searchable CIM fields
+    │  e.g. EventCode, SourceIp, DestinationPort, CommandLine, Image
+    │
+    │  ⚠️ Note: sourcetype is normalised to xmlwineventlog (lowercase)
+    │  by TA for Windows — this is expected behaviour, not a bug
     ▼
-Splunk Security Essentials (3435)
-    │  100+ pre-built detection rules run against normalised fields
-    │  Each rule tagged with MITRE ATT&CK technique ID
-    │  Fires alerts e.g. "Port Scan Detected — T1046 — Discovery"
+Custom SPL Alerts (hand-written per attack scenario)
+    │  e.g. EventCode=3 + dc(DestinationPort) > 20 → Port Scan
+    │  All alerts manually built and saved in Splunk
     ▼
 MITRE ATT&CK App (4617)
-    │  Reads alert hits and populates the ATT&CK matrix
+    │  Maps alert hits onto the ATT&CK matrix
     ▼
 ATT&CK Matrix Dashboard
-    Tactic columns light up based on what was detected in your lab
+    Technique cells light up based on your triggered alerts
 ```
-
+ 
+### Important: alerts are not automatic
+ 
+None of these apps auto-generate alerts out of the box. Security Essentials is a **reference library** — all 900+ rules are disabled by default and most require additional datamodel configuration. 
+ 
+All detection alerts in this lab are **hand-written SPL queries** saved as Splunk alerts. This is intentional — writing detections from scratch is better preparation for SOC work than enabling pre-built rules.
+ 
+See [`detection/`](detection/) for all SPL queries used in this lab.
+ 
 ### App details
-
+ 
 **Splunk Add-on for Sysmon (5709)** — Install first  
-Translates raw Sysmon XML into standardised CIM field names that other apps understand. Without this, Security Essentials rules won't match field names and detection won't work.
-
-**Splunk Security Essentials (3435)** — Most important  
-Pre-built detections for all common attack types: brute force, credential dumping, port scan, lateral movement, persistence, C2 beaconing. Each detection is already mapped to a MITRE technique ID and links directly to `attack.mitre.org`. No SPL needed to get started — just enable a rule and the alert is created automatically.
-
+Translates raw Sysmon XML into CIM-standard field names. Without this, Sysmon logs arrive as unparsed XML and fields like `SourceIp`, `CommandLine`, `Image` are not searchable.
+ 
+> ⚠️ The old Sysmon App (ID 3544) is archived — do not use it. Use 5709 instead.
+ 
+**Splunk Add-on for Microsoft Windows (742)** — Install second  
+Required alongside 5709. Enables correct parsing of native Windows Event Log fields (EventCode 4625, 4720, 4698, etc.) and provides the XML processing framework that Sysmon TA depends on.
+ 
+**Splunk Security Essentials (3435)** — SPL reference  
+A library of 900+ detection templates mapped to MITRE ATT&CK. Use it to understand how detections are structured, what data sources they need, and how to write your own SPL. Not an auto-alerting system.
+ 
 **MITRE ATT&CK App for Splunk (4617)** — Install last  
-Renders a live ATT&CK matrix heatmap inside Splunk. After running a port scan in the lab, T1046 (Network Service Discovery) under the Discovery tactic column will light up. Clicking any cell opens the full technique description on the MITRE website.
-
+Renders a live ATT&CK matrix heatmap. After a port scan alert fires, T1046 (Network Service Discovery) lights up under the Discovery tactic. Clicking any cell links directly to `attack.mitre.org`.
+ 
 ---
-
 
 ## 🔴 Attack Scenarios (Coming Soon)
 
