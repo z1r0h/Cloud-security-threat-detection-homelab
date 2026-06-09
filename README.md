@@ -13,6 +13,7 @@ This lab was built to bridge the gap between certification knowledge and real-wo
 - Writing custom Splunk SPL detection rules from scratch
 - Understanding how logs flow from endpoint → forwarder → SIEM → alert
 - Investigating alerts the same way a SOC Analyst would on the job
+
 **What this lab demonstrates:**
 - Hands-on experience with Sysmon telemetry and Windows Event Logs
 - Detection engineering — not just consuming alerts, but building them
