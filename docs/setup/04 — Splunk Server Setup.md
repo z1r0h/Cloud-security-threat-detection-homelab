@@ -58,14 +58,46 @@ Splunk is now ready to receive logs from Windows forwarders.
 
 ## Install Splunk Apps
 
-Install the following apps via **Apps → Find More Apps**:
+Install the following apps via **Apps → Find More Apps**. Install in this exact order:
 
-| Order | App | Splunkbase ID | Purpose |
+| Order | App | Splunkbase ID | Role |
 |---|---|---|---|
-| 1 | Splunk Add-on for Sysmon | [5709](https://splunkbase.splunk.com/app/5709) | CIM field mapping for Sysmon data |
-| 2 | Splunk Security Essentials | [3435](https://splunkbase.splunk.com/app/3435) | 100+ detection rules with MITRE mapping |
-| 3 | MITRE ATT&CK App for Splunk | [4617](https://splunkbase.splunk.com/app/4617) | ATT&CK matrix heatmap dashboard |
+| 1 | Splunk Add-on for Sysmon | [5709](https://splunkbase.splunk.com/app/5709) | Parses Sysmon XML into searchable fields (EventCode, SourceIp, CommandLine, etc.) |
+| 2 | Splunk Add-on for Microsoft Windows | [742](https://splunkbase.splunk.com/app/742) | Parses native Windows Event Log fields (EventCode 4625, 4720, 4698, etc.) |
+| 3 | Splunk Security Essentials | [3435](https://splunkbase.splunk.com/app/3435) | SPL reference library and detection rule templates mapped to MITRE ATT&CK |
+| 4 | MITRE ATT&CK App for Splunk | [4617](https://splunkbase.splunk.com/app/4617) | Visual ATT&CK matrix heatmap — lights up techniques based on your alert hits |
 
-> Install in order 1 → 2 → 3. App 5709 is the CIM foundation that the others depend on.
+> ⚠️ The old Sysmon App (ID 3544) is archived — do not use it. Use 5709 instead.
 
-> ⚠️ The old Sysmon App (ID 3544) is archived — do not use it.
+### What each app actually does
+
+**Apps 1 & 2 — Data foundation (install first)**
+Without these, Sysmon and Windows logs arrive as raw XML with no searchable fields. These TAs parse the data so fields like `EventCode`, `SourceIp`, `Image`, `CommandLine` are available in SPL.
+
+> **Note:** After installing TA for Windows (742), all Windows sourcetypes are normalised to `xmlwineventlog` (lowercase). This is expected behaviour — it does not affect functionality.
+
+**App 3 — SPL reference library (not auto-alerting)**
+Security Essentials is a detection rule library, not an automatic alert system. All 900+ rules are **disabled by default**. Use it to:
+- Look up how to detect a specific attack
+- Copy and adapt SPL queries for your own alerts
+- Understand what data sources each detection needs
+
+**App 4 — Portfolio visualisation**
+The ATT&CK matrix populates based on alerts you build yourself. After a port scan alert fires, T1046 (Discovery) lights up on the matrix. Useful for demonstrating detection coverage.
+
+### Important: Alerts must be built manually
+
+None of these apps auto-generate alerts. To detect attacks, you must write SPL queries and save them as alerts. See [`detection/`](../../detection/) for all SPL queries used in this lab.
+
+Example — Port Scan detection (T1046):
+
+```spl
+index=wineventlog source="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=3
+| bucket _time span=1m
+| stats dc(DestinationPort) as unique_ports by _time, SourceIp, DestinationIp
+| where unique_ports > 20
+| eval mitre_technique="T1046"
+| eval mitre_tactic="Discovery"
+```
+
+Save as: **Alert → Real-time → Per-Result → Add to Triggered Alerts**
