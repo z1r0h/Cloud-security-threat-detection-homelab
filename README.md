@@ -6,22 +6,17 @@ A hands-on adversarial simulation lab built on GCP to practice threat detection,
  
 ## 🎯 Purpose
  
-This lab was built to bridge the gap between certification knowledge and real-world SOC work.
- 
-**What this lab practices:**
-- Simulating real attacker techniques using Kali Linux (MITRE ATT&CK mapped)
+This lab bridges the gap between certification knowledge and real-world SOC work.
+
+**What it practices**
+- Simulating real attacker techniques from Kali Linux, mapped to MITRE ATT&CK
 - Writing custom Splunk SPL detection rules from scratch
 - Understanding how logs flow from endpoint → forwarder → SIEM → alert
-- Investigating alerts the same way a SOC Analyst would on the job
+- Investigating alerts the way a SOC analyst does on the job
 
-**What this lab demonstrates:**
-- Hands-on experience with Sysmon telemetry and Windows Event Logs
-- Detection engineering — not just consuming alerts, but building them
-- Active Directory attack surface awareness (credential abuse, lateral movement, persistence)
-- Documentation discipline — every attack scenario recorded with commands, SPL, and findings
-> This lab is intentionally kept close to entry-level SOC reality: Sysmon-based endpoint detection without a firewall or IDS, reflecting what many organisations actually rely on. Limitations are documented honestly in each attack scenario.
+**Design principle: configure once, attack many.**
+All logging (Sysmon, Windows audit policy, PowerShell) is configured in a single setup step. After taking baseline images, every one of the 14 attack scenarios runs without reconfiguring anything.
  
-
 ---
 
 ## 🖥️ Lab Architecture
@@ -86,20 +81,21 @@ flowchart TB
 All machines are in a private VPC (`security-lab-vpc`) with no public exposure.  
 Access is via **Google IAP Tunnel** only.
 
-Created by [Mermaid Live Editor](https://mermaid.ai/)
-
 ---
 
 ## ⚙️ Tech Stack
 
-| Component | Tool |
-|---|---|
-| Cloud | Google Cloud Platform (GCP) |
-| SIEM | Splunk Enterprise |
-| Log Collection | Sysmon + Splunk Universal Forwarder |
-| AD Environment | Windows Server 2022 Active Directory |
-| Attack Machine | Kali Linux (GUI via VNC) |
-| Secure Access | Google Identity-Aware Proxy (IAP) |
+| Component          | Tool                                                    |
+| ------------------ | ------------------------------------------------------- |
+| Cloud              | Google Cloud Platform                                   |
+| SIEM               | Splunk Enterprise (Developer License)                   |
+| Endpoint telemetry | Sysmon (olafhartong/sysmon-modular config)              |
+| Windows logging    | Advanced Audit Policy + PowerShell Script Block Logging |
+| Log shipping       | Splunk Universal Forwarder (port 9997)                  |
+| AD environment     | Windows Server 2022                                     |
+| Attacker           | Kali Linux                                              |
+| Secure access      | Google Identity-Aware Proxy                             |
+
 
 ---
 
@@ -175,15 +171,51 @@ Renders a live ATT&CK matrix heatmap. After a port scan alert fires, T1046 (Netw
  
 ---
 
+## 🚀 Setup
+
+Follow in order. Steps 1–5 build the environment; **step 6 is the key one-time logging setup** (Sysmon + audit policy + PowerShell logging + forwarder, all at once); step 7 snapshots the baseline.
+
+| Step | Guide |
+|---|---|
+| 01 | [VPC Network & Firewall Rules](docs/setup/01%20%E2%80%94%20VPC%20Network%20%26%20Firewall%20Rules.md) |
+| 02 | [VM Instances](docs/setup/02%20%E2%80%94%20VM%20Instances.md) |
+| 03 | [Connecting via IAP Tunnel](docs/setup/03%20%E2%80%94%20Connecting%20via%20IAP%20Tunnel.md) |
+| 04 | [Splunk Server Setup](docs/setup/04%20%E2%80%94%20Splunk%20Server%20Setup.md) |
+| 05 | [Active Directory Domain Controller](docs/setup/05%20%E2%80%94%20Active%20Directory%20Domain%20Controller.md) |
+| 06 | [**Sysmon, Forwarder & Full Logging Setup (one-time)**](docs/setup/06%20%E2%80%94%20Sysmon%2C%20Forwarder%20%26%20Full%20Logging%20Setup.md) |
+| 07 | [VM Backup & Recovery](docs/setup/07%20%E2%80%94%20VM%20Backup%20%26%20Recovery.md) |
+
+---
 ## 🔴 Attack Scenarios (Coming Soon)
 
-| # | Scenario | MITRE Technique | Status |
+Run from `attacks/`, detect with `detection/`. Click through for commands, SPL, and alert settings.
+
+### 🟢 Beginner
+| # | Scenario | Technique | Status |
 |---|---|---|---|
-| 01 | Credential Dumping (Mimikatz) | T1003 | 🔜 |
-| 02 | Pass-the-Hash Lateral Movement | T1550.002 | 🔜 |
-| 03 | Persistence via Scheduled Task | T1053.005 | 🔜 |
-| 04 | C2 Beacon Simulation | T1071 | 🔜 |
-| 05 | Brute Force RDP | T1110.001 | 🔜 |
+| 01 | [Network Port Scan](attacks/01-network-port-scan/README.md) | T1046 | 🔜 |
+| 02 | [RDP Brute Force](attacks/02-rdp-brute-force/README.md) | T1110.001 | 🔜 |
+| 03 | [PowerShell Download Cradle](attacks/03-powershell-cradle/README.md) | T1059.001 | 🔜 |
+| 04 | [Rogue Local User Creation](attacks/04-rogue-user/README.md) | T1136.001 | 🔜 |
+
+### 🟡 Intermediate
+| # | Scenario | Technique | Status |
+|---|---|---|---|
+| 05 | [Credential Dumping (Mimikatz)](attacks/05-credential-dumping/README.md) | T1003.001 | 🔜 |
+| 06 | [Pass-the-Hash](attacks/06-pass-the-hash/README.md) | T1550.002 | 🔜 |
+| 07 | [Scheduled Task Persistence](attacks/07-scheduled-task/README.md) | T1053.005 | 🔜 |
+| 08 | [SMB Share Enumeration](attacks/08-smb-enumeration/README.md) | T1135 | 🔜 |
+| 09 | [Registry Run Key Persistence](attacks/09-registry-run-key/README.md) | T1547.001 | 🔜 |
+| 10 | [Kerberoasting](attacks/10-kerberoasting/README.md) | T1558.003 | 🔜 |
+
+### 🔴 Advanced
+| # | Scenario | Technique | Status |
+|---|---|---|---|
+| 11 | [C2 Beacon Simulation](attacks/11-c2-beacon/README.md) | T1071 | 🔜 |
+| 12 | [DCSync Attack](attacks/12-dcsync/README.md) | T1003.006 | 🔜 |
+| 13 | [Golden Ticket](attacks/13-golden-ticket/README.md) | T1558.001 | 🔜 |
+| 14 | [Full APT Attack Chain](attacks/14-apt-chain/README.md) | Multiple | 🔜 |
+
 
 ---
 
@@ -200,20 +232,6 @@ Detection flow for every scenario:
 
 ---
 
-## 🚀 Setup
-
-See [`docs/setup/`](docs/setup/) for full step-by-step instructions.
-
-**Quick overview:**
-1. Create VPC + firewall rules (IAP + internal traffic)
-2. Spin up 4 VMs (win-dc, win-client, splunk-server, kali-attacker)
-3. Install Splunk on Ubuntu, configure port 9997 receiver
-4. Promote win-dc to AD Domain Controller (`200teamok.local`)
-5. Join win-client to domain
-6. Install Sysmon + Splunk Universal Forwarder on both Windows VMs
-7. Snapshot all VMs as clean baseline images
-
----
 
 ## 🔄 VM Recovery
 
