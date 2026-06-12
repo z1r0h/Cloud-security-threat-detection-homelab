@@ -27,15 +27,10 @@ nmap -sT 10.0.10.10
 nmap -sT -sV 10.0.10.10
 ```
 
-> Use `-sT` not the default `-sS`. SYN scans don't complete the TCP handshake, so Sysmon Event 3 won't record them. With the sysmon-modular config from setup 06, all open-port connections are logged.
-
----
-
 ## Detection (summary)
 
 Full SPL and alert settings: [detection/01-network-port-scan.md](../../detection/01-network-port-scan.md).
 
-After `nmap -sT 10.0.10.10` you should see connections to many ports (53, 88, 135, 389, 445, 3389...) from 10.0.10.3.
 
 ---
 
