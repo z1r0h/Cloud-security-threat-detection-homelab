@@ -182,7 +182,7 @@ Follow in order. Steps 1–5 build the environment; **step 6 is the key one-time
 | 03 | [Connecting via IAP Tunnel](docs/setup/03%20%E2%80%94%20Connecting%20via%20IAP%20Tunnel.md) |
 | 04 | [Splunk Server Setup](docs/setup/04%20%E2%80%94%20Splunk%20Server%20Setup.md) |
 | 05 | [Active Directory Domain Controller](docs/setup/05%20%E2%80%94%20Active%20Directory%20Domain%20Controller.md) |
-| 06 | [**Sysmon, Forwarder & Full Logging Setup (one-time)**](docs/setup/06%20%E2%80%94%20Sysmon%2C%20Forwarder%20%26%20Full%20Logging%20Setup.md) |
+| 06 | [**Sysmon, Forwarder & Full Logging Setup (one-time)**](docs/setup/06%20—%20Sysmon%20%26%20Splunk%20Universal%20Forwarder.md) |
 | 07 | [VM Backup & Recovery](docs/setup/07%20—%20VM%20Backup%20%26%20Recovery.md) |
 
 ---
