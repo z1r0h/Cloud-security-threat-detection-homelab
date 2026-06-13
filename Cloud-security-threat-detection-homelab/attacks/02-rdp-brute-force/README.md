@@ -4,7 +4,7 @@
 
 | Field           | Detail                                                                                       |
 | --------------- | -------------------------------------------------------------------------------------------- |
-| Status          | 🔜 Pending                                                                                   |
+| Status          | ✅ Completed                                                                                  |
 | Date            | 13 June 2026                                                                                 |
 | Tier            | Beginner                                                                                     |
 | Attacker        | kali-linux-attacker-vm (10.0.10.3)                                                           |
@@ -48,9 +48,10 @@ Full SPL, alert settings, and notes are in the [detection file](../../detection/
 
 ## Screenshots
 
-> *(Add after completing)*
+![alt text](screenshots/01-create-password-list.png) 
+![alt text](screenshots/02-hydra-brute-force-rdp.png) 
+![alt text](screenshots/03-splunk-eventcode.png) 
+![alt text](screenshots/04-alert-triggered.png)
 
-- `screenshots/01-attack.png`
-- `screenshots/02-splunk-events.png`
-- `screenshots/03-alert.png`
+
 
