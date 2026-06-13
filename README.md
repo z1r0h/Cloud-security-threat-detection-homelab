@@ -43,25 +43,6 @@ A 4-VM private VPC (no public IPs — access via IAP tunnelling):
 - Splunk Enterprise set up as the SIEM
 - Sysmon telemetry flowing end-to-end into Splunk
 
-### Current focus 🟡
-
-Detection engineering, working through scenarios one at a time. Currently on:
-
-- **Network Scanning — MITRE ATT&CK [T1046](https://attack.mitre.org/techniques/T1046/)**
-  - Running Nmap port/host scans from Kali against the Windows endpoint
-  - Writing and tuning the detection SPL in Splunk
-  - Investigating Sysmon network-connection logging (Event ID 3) for scan traffic — looking at why SYN scans aren't reliably logged (SYN-scan vs full TCP-connect behaviour) and selecting the right telemetry source for inbound scan detection
-
-### Roadmap ⚪
-
-- [ ] Finish T1046 network-scan detection
-- [ ] Brute-force detection (failed/successful logon patterns)
-- [ ] Lateral movement detection
-- [ ] Map each detection to its MITRE ATT&CK technique
-- [ ] Write up notes / lessons learned per scenario
-
----
-
 ## Tools & Tech
 
 GCP · Splunk Enterprise (SPL) · Sysmon · Windows Server / Active Directory · Kali Linux · MITRE ATT&CK · Nmap
