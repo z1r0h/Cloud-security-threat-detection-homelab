@@ -119,7 +119,6 @@ Four apps are installed on `splunk-server`. Install in this exact order:
 | 1 | **Splunk Add-on for Sysmon** | [ID 5709](https://splunkbase.splunk.com/app/5709) | Parses Sysmon XML into searchable fields |
 | 2 | **Splunk Add-on for Microsoft Windows** | [ID 742](https://splunkbase.splunk.com/app/742) | Parses native Windows Event Log fields |
 | 3 | **Splunk Security Essentials** | [ID 3435](https://splunkbase.splunk.com/app/3435) | SPL reference library + MITRE-mapped detection templates |
-| 4 | **MITRE ATT&CK App for Splunk** | [ID 4617](https://splunkbase.splunk.com/app/4617) | Visual ATT&CK matrix heatmap |
  
 ### How they work together
  
@@ -137,12 +136,7 @@ TA for Sysmon (5709) + TA for Windows (742)
 Custom SPL Alerts (hand-written per attack scenario)
     │  e.g. EventCode=3 + dc(DestinationPort) > 20 → Port Scan
     │  All alerts manually built and saved in Splunk
-    ▼
-MITRE ATT&CK App (4617)
-    │  Maps alert hits onto the ATT&CK matrix
-    ▼
-ATT&CK Matrix Dashboard
-    Technique cells light up based on your triggered alerts
+
 ```
  
 ### Important: alerts are not automatic
